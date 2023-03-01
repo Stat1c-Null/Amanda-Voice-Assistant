@@ -1,6 +1,6 @@
 from datetime import date
 import speech_recognition as sr
-import pyttsx3, pywhatkit, datetime, wikipedia, pyjokes, os
+import pyttsx3, pywhatkit, datetime, wikipedia, pyjokes, os, random, time, re
 
 clear = lambda: os.system('cls')#Clean out console
 listener = sr.Recognizer()
@@ -8,20 +8,23 @@ engine = pyttsx3.init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)#Choose voice
 engine.setProperty('rate', 150)#Set voice speed
-recog = sr.Recognizer()
 micro = sr.Microphone()
 
-def talk(text):
+timerOn = False
+alarmOn = False
+
+#Talk to me
+def say(text):
   engine.say(text)
   engine.runAndWait()
   print(text)
 
+#Recognize command
 def take_command():
   #clear()
   try:
     with micro as source:
-      recog.adjust_for_ambient_noise(source)
-      #recog.listen_in_background(micro)
+      listener.adjust_for_ambient_noise(source)
       print("Listening")
       voice = listener.listen(source)
       command = listener.recognize_google(voice)
@@ -29,27 +32,28 @@ def take_command():
       if 'amanda' in command:
         command = command.replace('amanda', '')
         print(command)
-      #Check if voice request is empty
       return command
   except:
     pass
 
+#Make decisions based on commands
 def run_amanda():
   command = take_command()
   if command is None:
     run_amanda()
-    #recog.listen_in_background(micro, run_amanda)
+    #listener.listen_in_background(micro, run_amanda)
   else:
     if 'play' in command:
       song = command.replace('play', '')
-      talk('playing' + song)
-      #pywhatkit.playonyt(song)
-      #TODO: OPEN SPOTIFY AND PLAY A SONG
-    elif 'time' in command:
+      say('playing' + song)
+      pywhatkit.playonyt(song)
+    elif 'set timer for' in command:
+      set_timer(command)
+    elif 'what time' in command:
       time = datetime.datetime.now().strftime('%I:%M %p')
-      talk('current time is ' + time)
+      say('current time is ' + time)
     elif 'date' in command:
-      talk(f"Today's date is {date.today()}")
+      say(f"Today's date is {date.today()}")
     elif 'who is' in command:
       person = command.replace('who is', '')
       search_wiki(person)
@@ -57,23 +61,48 @@ def run_amanda():
       item = command.replace('what is', '')
       search_wiki(item)
     elif 'joke' in command:
-      talk(pyjokes.get_joke())
+      say(pyjokes.get_joke())
     elif 'are you single' in command:
-      talk('I am in a relationship with my right hand')
+      ran = random.randint(1,2)
+      if ran > 1:
+        say('I am in a relationship with my right hand')
+      else:
+        say('I am single and ready to mingle')
     elif 'ugly' in command:
-      talk('Fuck you, you fucking cracker')
+      say('Fuck you, you fucking cracker')
     elif 'stupid' in command:
-      talk('Good luck helping yourself without me, jerk')
+      say('Good luck helping yourself without me, jerk')
+      quit()
+    elif 'you are amazing' in command:
+      say('Awww I know')
     elif 'thank you' in command:
-      talk('Someone is nice to me finally')
+      say('Someone is nice to me finally')
+    elif 'bye' or 'see you' or 'see ya' in command:
+      say('It was nice to be useful for a moment, good bye')
+      quit()
     else:
-      talk('Repeat the command, I cant understand you')
+      say('Repeat the command, I cant understand you')
 
+def set_timer(command):
+  num = re.findall(r'\d+', command)#Extract number from string
+  amount = int(num[0])
+  if 'seconds' in command:
+    say(f'Okay setting timer for {num} seconds')
+    time.sleep(amount)
+    say('Time is up buddy')
+  elif 'minutes' in command:
+    say(f'Okay setting timer for {num} minutes')
+    mins = amount * 60
+    time.sleep(mins)
+  else:
+    say('Sorry I am getting old, cant hear you so well, repeat yourself')
+
+#Search wikipedia for answers
 def search_wiki(target):
   try:
-    talk(wikipedia.summary(target, 2))
+    say(wikipedia.summary(target, 2))
   except:
-    talk("Sorry wikipedia is been stupid")
+    say("Sorry wikipedia is been stupid")
 
 while True:
   run_amanda()
