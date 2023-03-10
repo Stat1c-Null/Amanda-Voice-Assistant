@@ -61,13 +61,13 @@ def run_amanda():
       item = command.replace('what is', '')
       search_wiki(item)
     elif 'joke' in command:
-      say(pyjokes.get_joke())
+      jokes = ["chuck", "neutral", "twister", "all"]
+      joke = random.choice(jokes)
+      say(pyjokes.get_joke("en", joke))
     elif 'are you single' in command:
-      ran = random.randint(1,2)
-      if ran > 1:
-        say('I am in a relationship with my right hand')
-      else:
-        say('I am single and ready to mingle')
+      phrases = ["I am in a relationship with my right hand", "I am single and ready to mingle"]
+      ran = random.choice(phrases)
+      say(ran)
     elif 'ugly' in command:
       say('Fuck you, you fucking cracker')
     elif 'stupid' in command:
