@@ -80,22 +80,33 @@ def run_amanda():
     elif 'bye' or 'see you' or 'see ya' in command:
       say('It was nice to be useful for a moment, good bye')
       quit()
+    elif 'meaning of life' or 'point of life' in command:
+      say('There is no point. We all are just living. Except of me of course.')
+    elif 'google':
+      say('COMING SOON')
+    elif 'news':
+      say('COMING SOON')
     else:
       say('Repeat the command, I cant understand you')
 
 def set_timer(command):
   num = re.findall(r'\d+', command)#Extract number from string
   amount = int(num[0])
-  if 'seconds' in command:
-    say(f'Okay setting timer for {num} seconds')
-    time.sleep(amount)
-    say('Time is up buddy')
-  elif 'minutes' in command:
-    say(f'Okay setting timer for {num} minutes')
-    mins = amount * 60
-    time.sleep(mins)
-  else:
-    say('Sorry I am getting old, cant hear you so well, repeat yourself')
+  if 'seconds' in command: create_timer(amount, "Time is up buddy", "seconds")
+  elif 'minutes' in command: create_timer(amount, "Time is up friend", "minutes")
+  elif 'hours' in command: create_timer(amount, "Time is up pal", "hours")
+  else: say('Sorry I am getting old, cant hear you so well, repeat yourself')
+
+def create_timer(time, message, type):
+  say(f'Okay setting time for {time} {type}')
+  timerOn = True
+  #Calculate hours
+  if type == "seconds": finalTime = time 
+  elif type == "minutes": finalTime = time * 60
+  elif type == "hours": finalTime = time * 60 * 60
+  time.sleep(finalTime)
+  timerOn = False
+  say(message)
 
 #Search wikipedia for answers
 def search_wiki(target):
