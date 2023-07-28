@@ -1,6 +1,7 @@
 from datetime import date
 import speech_recognition as sr
 import pyttsx3, pywhatkit, datetime, wikipedia, pyjokes, os, random, time, re
+from newsapi import NewsApiClient
 
 clear = lambda: os.system('cls')#Clean out console
 listener = sr.Recognizer()
@@ -12,6 +13,9 @@ micro = sr.Microphone()
 
 timerOn = False
 alarmOn = False
+
+NEWS_API_KEY = ''
+newsapi = NewsApiClient(api_key=NEWS_API_KEY)
 
 #Talk to me
 def say(text):
@@ -85,9 +89,26 @@ def run_amanda():
     elif 'google':
       say('COMING SOON')
     elif 'news':
-      say('COMING SOON')
+      get_news()
     else:
       say('Repeat the command, I cant understand you')
+
+def get_news():
+  say('Alright let me look for some fresh news')
+  count = 0
+  try:
+    all_articles = newsapi.get_top_headlines(category='general',
+                                              country='us',
+                                              language='en')
+    for news in all_articles['articles']:
+      count += 1
+      say(news['title'])
+      say(news['description'])
+      say('Published by ' + str(news['author']))
+      if count == 3:
+        break
+  except:
+    say('Sorry an error occured')
 
 def set_timer(command):
   num = re.findall(r'\d+', command)#Extract number from string
